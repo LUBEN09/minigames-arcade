@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .error-code {
+      font-family: var(--font-pixel);
+      font-size: clamp(4rem, 15vw, 8rem);
+      color: var(--neon-pink);
+      text-shadow: var(--glow-pink);
+      line-height: 1;
+      animation: glow-pulse 2s ease-in-out infinite;
+    }
+
+    .error-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.6rem, 2.5vw, 1rem);
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .error-desc {
+      color: var(--text-muted);
+      max-width: 400px;
+      font-size: 0.9rem;
+    }
+
+    .ghost {
+      font-size: 5rem;
+      animation: float 3s ease-in-out infinite;
+      display: block;
+    }
+
+    .glitch {
+      position: relative;
+    }
+    .glitch::before,
+    .glitch::after {
+      content: '404';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+    }
+    .glitch::before {
+      color: var(--neon-cyan);
+      clip: rect(0, 900px, 0, 0);
+      animation: glitch1 2s infinite;
+    }
+    .glitch::after {
+      color: var(--neon-green);
+      clip: rect(0, 900px, 0, 0);
+      animation: glitch2 2s infinite;
+    }
+
+    @keyframes glitch1 {
+      0%,100%{clip:rect(42px,9999px,44px,0);transform:translateX(-4px)}
+      20%{clip:rect(12px,9999px,59px,0);transform:translateX(4px)}
+      40%{clip:rect(78px,9999px,20px,0);transform:translateX(-2px)}
+      60%{clip:rect(5px,9999px,33px,0);transform:translateX(2px)}
+      80%{clip:rect(90px,9999px,10px,0);transform:translateX(-4px)}
+    }
+    @keyframes glitch2 {
+      0%,100%{clip:rect(65px,9999px,3px,0);transform:translateX(2px)}
+      20%{clip:rect(30px,9999px,55px,0);transform:translateX(-2px)}
+      40%{clip:rect(8px,9999px,75px,0);transform:translateX(4px)}
+      60%{clip:rect(50px,9999px,25px,0);transform:translateX(-4px)}
+      80%{clip:rect(15px,9999px,60px,0);transform:translateX(2px)}
+    }
+  </style>
+</head>
+<body>
+  <div class="error-page">
+    <span class="ghost">👻</span>
+    <div class="error-code glitch">404</div>
+    <h1 class="error-title">PÁGINA NO ENCONTRADA</h1>
+    <p class="error-desc">
+      Esta página se ha desvanecido en el vacío del arcade.<br>
+      El fantasma del juego se la llevó...
+    </p>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+      <a href="index.html" class="btn btn-primary">🕹️ VOLVER AL ARCADE</a>
+      <a href="javascript:history.back()" class="btn btn-outline">← ATRÁS</a>
+    </div>
+    <p style="font-family:var(--font-pixel); font-size:0.45rem; color:var(--text-muted); margin-top:1rem;">
+      INSERT COIN TO CONTINUE
+      <span class="animate-blink">_</span>
+    </p>
+  </div>
+</body>
+</html>

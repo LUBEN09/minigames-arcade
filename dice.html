@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dados Arcade — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Dice display */
+    .dice-area {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 2rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .die {
+      width: 90px;
+      height: 90px;
+      background: var(--bg-deep);
+      border: 2px solid var(--neon-yellow);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      cursor: pointer;
+      position: relative;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 0 10px rgba(255,230,0,0.2);
+      user-select: none;
+    }
+
+    .die.rolling {
+      animation: diceRoll 0.6s ease;
+    }
+
+    @keyframes diceRoll {
+      0%  { transform: rotate(0deg)   scale(1);   }
+      20% { transform: rotate(-15deg) scale(1.1); }
+      40% { transform: rotate(10deg)  scale(0.95);}
+      60% { transform: rotate(-8deg)  scale(1.05);}
+      80% { transform: rotate(5deg)   scale(0.98);}
+      100%{ transform: rotate(0deg)   scale(1);   }
+    }
+
+    .die .die-value {
+      font-family: var(--font-pixel);
+      font-size: 2rem;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+
+    .die-plus {
+      font-family: var(--font-pixel);
+      font-size: 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .die-sum {
+      font-family: var(--font-pixel);
+      font-size: 2.5rem;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    /* Race mode */
+    .race-section {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .race-player {
+      margin-bottom: 1rem;
+    }
+
+    .race-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .race-name {
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+    }
+
+    .race-score {
+      font-family: var(--font-pixel);
+      font-size: 0.7rem;
+    }
+
+    .race-bar-track {
+      height: 18px;
+      background: var(--bg-deep);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .race-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(.17,.67,.36,1);
+      min-width: 4px;
+    }
+
+    .player1-bar { background: linear-gradient(90deg, var(--neon-cyan), #007aff); box-shadow: 0 0 8px rgba(0,212,255,0.5); }
+    .player2-bar { background: linear-gradient(90deg, var(--neon-pink), #cc0055); box-shadow: 0 0 8px rgba(255,45,120,0.5); }
+
+    /* Race controls */
+    .race-controls {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* History */
+    .history-scroll {
+      max-height: 200px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--neon-cyan) var(--bg-deep);
+    }
+
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .history-row:last-child { border-bottom: none; }
+
+    .history-sum {
+      font-family: var(--font-pixel);
+      font-size: 0.7rem;
+      color: var(--neon-yellow);
+    }
+
+    /* Mode tabs */
+    .mode-tabs {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .mode-tab {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      font-family: var(--font-pixel);
+      font-size: 0.48rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-tab.active, .mode-tab:hover {
+      border-color: var(--neon-yellow);
+      color: var(--neon-yellow);
+    }
+
+    /* Winner banner */
+    .winner-banner {
+      display: none;
+      padding: 1rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--neon-green);
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0,255,136,0.2);
+    }
+    .winner-banner.show { display: block; }
+    .winner-text {
+      font-family: var(--font-pixel);
+      font-size: 0.8rem;
+      color: var(--neon-green);
+      text-shadow: var(--glow-green);
+    }
+  </style>
+</head>
+<body class="game-page">
+
+  <header class="game-header">
+    <a href="index.html" class="btn btn-outline btn-sm">← Menú</a>
+    <h1 class="game-title">🎲 DADOS ARCADE</h1>
+    <button class="btn btn-pink btn-sm" id="resetBtn">↺ RESET</button>
+  </header>
+
+  <main class="game-main">
+
+    <!-- Mode tabs -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="setMode('free')">🎲 MODO LIBRE</button>
+      <button class="mode-tab"        onclick="setMode('race')">🏁 CARRERA A 100</button>
+    </div>
+
+    <!-- ── FREE MODE ── -->
+    <div id="freeSection">
+
+      <!-- Dice area -->
+      <div class="dice-area">
+        <div class="die" id="die1"><span class="die-value" id="d1val">?</span></div>
+        <span class="die-plus">+</span>
+        <div class="die" id="die2"><span class="die-value" id="d2val">?</span></div>
+        <span style="font-family:var(--font-pixel); color:var(--text-muted); font-size:1rem;">=</span>
+        <span class="die-sum" id="dieSum">?</span>
+      </div>
+
+      <button class="btn btn-primary" id="rollBtn" style="font-size:0.7rem; padding:0.8rem 2rem;">🎲 LANZAR DADOS</button>
+
+      <!-- Stats -->
+      <div class="scoreboard">
+        <div class="score-item">
+          <span class="score-label">Tiradas</span>
+          <span class="score-value" id="totalRolls">0</span>
+        </div>
+        <div class="score-item best">
+          <span class="score-label">Máx. suma</span>
+          <span class="score-value" id="maxSum">—</span>
+        </div>
+        <div class="score-item draws">
+          <span class="score-label">Media</span>
+          <span class="score-value" id="avgSum">—</span>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="panel" style="max-width:480px;">
+        <div class="panel-title">📋 Historial de tiradas</div>
+        <div class="history-scroll" id="historyContainer">
+          <p style="color:var(--text-muted); font-size:0.78rem; text-align:center; padding:0.5rem;">Sin tiradas aún</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RACE MODE ── -->
+    <div id="raceSection" style="display:none; width:100%; max-width:600px; display:none;">
+
+      <div class="winner-banner" id="winnerBanner">
+        <div style="font-size:2rem;">🏆</div>
+        <div class="winner-text" id="winnerText">¡JUGADOR 1 GANA!</div>
+      </div>
+
+      <div class="race-section">
+
+        <div class="race-player">
+          <div class="race-header">
+            <span class="race-name" style="color:var(--neon-cyan);">👤 JUGADOR 1</span>
+            <span class="race-score" style="color:var(--neon-cyan);" id="score1">0 / 100</span>
+          </div>
+          <div class="race-bar-track">
+            <div class="race-bar-fill player1-bar" id="bar1" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="race-player">
+          <div class="race-header">
+            <span class="race-name" style="color:var(--neon-pink);">🤖 JUGADOR 2 (CPU)</span>
+            <span class="race-score" style="color:var(--neon-pink);" id="score2">0 / 100</span>
+          </div>
+          <div class="race-bar-track">
+            <div class="race-bar-fill player2-bar" id="bar2" style="width:0%"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="race-controls">
+        <button class="btn btn-primary" id="raceRollBtn">🎲 LANZAR (Jugador 1)</button>
+        <button class="btn btn-outline btn-sm" id="raceResetBtn">↺ REINICIAR CARRERA</button>
+      </div>
+
+      <div style="font-family:var(--font-pixel); font-size:0.52rem; color:var(--text-muted); text-align:center;" id="raceMsg">
+        Lanza los dados para avanzar. ¡El primero en llegar a 100 gana!
+      </div>
+
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <strong>Modo Libre:</strong> Haz clic en "Lanzar Dados" para tirar dos dados y ver la suma.<br>
+      <strong>Modo Carrera:</strong> Lanza los dados para avanzar puntos. La CPU tira automáticamente. ¡El primero en 100 gana!
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-section">
+      <div class="ad-placeholder">📢 Google AdSense — 728×90</div>
+    </div>
+
+  </main>
+
+  <script>
+  // ============================================================
+  //  Dados Arcade — Game Logic
+  // ============================================================
+
+  const FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+  let mode        = 'free';
+  let rollHistory = [];
+  let totalRolls  = 0;
+  let sumTotal    = 0;
+  let maxSumVal   = 0;
+
+  // Race state
+  let raceScores  = [0, 0];
+  let raceOver    = false;
+
+  const die1El    = document.getElementById('die1');
+  const die2El    = document.getElementById('die2');
+  const d1val     = document.getElementById('d1val');
+  const d2val     = document.getElementById('d2val');
+  const dieSum    = document.getElementById('dieSum');
+  const rollBtn   = document.getElementById('rollBtn');
+  const totalRollsEl = document.getElementById('totalRolls');
+  const maxSumEl  = document.getElementById('maxSum');
+  const avgSumEl  = document.getElementById('avgSum');
+  const historyContainer = document.getElementById('historyContainer');
+
+  rollBtn.addEventListener('click', rollFree);
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
+  document.getElementById('raceRollBtn').addEventListener('click', raceRoll);
+  document.getElementById('raceResetBtn').addEventListener('click', raceReset);
+
+  // ── Free Mode ──
+  function rollFree() {
+    const [v1, v2] = rollDice();
+    const sum = v1 + v2;
+
+    animateDice(v1, v2, sum, () => {
+      totalRolls++;
+      sumTotal += sum;
+      if (sum > maxSumVal) maxSumVal = sum;
+
+      rollHistory.unshift({ v1, v2, sum });
+      if (rollHistory.length > 20) rollHistory.pop();
+
+      totalRollsEl.textContent = totalRolls;
+      maxSumEl.textContent     = maxSumVal;
+      avgSumEl.textContent     = (sumTotal / totalRolls).toFixed(1);
+      renderHistory();
+    });
+  }
+
+  function animateDice(v1, v2, sum, callback) {
+    rollBtn.disabled = true;
+    die1El.classList.add('rolling');
+    die2El.classList.add('rolling');
+    d1val.textContent = '?';
+    d2val.textContent = '?';
+    dieSum.textContent = '?';
+
+    // Rapid cycle animation
+    let ticks = 0;
+    const interval = setInterval(() => {
+      d1val.textContent = Math.ceil(Math.random()*6);
+      d2val.textContent = Math.ceil(Math.random()*6);
+      if (++ticks >= 8) {
+        clearInterval(interval);
+        die1El.classList.remove('rolling');
+        die2El.classList.remove('rolling');
+        d1val.textContent  = v1;
+        d2val.textContent  = v2;
+        dieSum.textContent = sum;
+        rollBtn.disabled   = false;
+        callback?.();
+      }
+    }, 80);
+  }
+
+  function renderHistory() {
+    if (!rollHistory.length) {
+      historyContainer.innerHTML = '<p style="color:var(--text-muted);font-size:0.78rem;text-align:center;padding:0.5rem;">Sin tiradas aún</p>';
+      return;
+    }
+    historyContainer.innerHTML = rollHistory.map((r, i) => `
+      <div class="history-row">
+        <span style="color:var(--text-muted)">#${totalRolls - i}</span>
+        <span>${FACES[r.v1-1]} + ${FACES[r.v2-1]} = <strong style="color:var(--text-main)">${r.v1} + ${r.v2}</strong></span>
+        <span class="history-sum">${r.sum}</span>
+      </div>`).join('');
+  }
+
+  // ── Race Mode ──
+  function raceRoll() {
+    if (raceOver) return;
+    const [v1, v2] = rollDice();
+    const p1Roll = v1 + v2;
+    raceScores[0] = Math.min(100, raceScores[0] + p1Roll);
+
+    const [v3, v4] = rollDice();
+    const p2Roll = v3 + v4;
+    raceScores[1] = Math.min(100, raceScores[1] + p2Roll);
+
+    updateRaceBars();
+    document.getElementById('raceMsg').textContent =
+      `Jugador 1 +${p1Roll} → ${raceScores[0]} | CPU +${p2Roll} → ${raceScores[1]}`;
+
+    if (raceScores[0] >= 100 || raceScores[1] >= 100) {
+      raceOver = true;
+      const winner = raceScores[0] >= 100 && raceScores[1] >= 100
+        ? '🤝 ¡EMPATE!'
+        : raceScores[0] >= 100
+          ? '🏆 ¡JUGADOR 1 GANA!'
+          : '🤖 ¡CPU GANA!';
+      document.getElementById('winnerText').textContent = winner;
+      document.getElementById('winnerBanner').classList.add('show');
+      document.getElementById('raceRollBtn').disabled = true;
+    }
+  }
+
+  function raceReset() {
+    raceScores = [0, 0];
+    raceOver   = false;
+    updateRaceBars();
+    document.getElementById('winnerBanner').classList.remove('show');
+    document.getElementById('raceRollBtn').disabled = false;
+    document.getElementById('raceMsg').textContent =
+      'Lanza los dados para avanzar. ¡El primero en llegar a 100 gana!';
+  }
+
+  function updateRaceBars() {
+    document.getElementById('score1').textContent = `${raceScores[0]} / 100`;
+    document.getElementById('score2').textContent = `${raceScores[1]} / 100`;
+    document.getElementById('bar1').style.width   = raceScores[0] + '%';
+    document.getElementById('bar2').style.width   = raceScores[1] + '%';
+  }
+
+  // ── Mode switch ──
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-tab').forEach((t, i) => {
+      t.classList.toggle('active', (i===0 && m==='free') || (i===1 && m==='race'));
+    });
+    document.getElementById('freeSection').style.display  = m === 'free' ? '' : 'none';
+    document.getElementById('raceSection').style.display  = m === 'race' ? 'flex' : 'none';
+    if (m === 'race') {
+      document.getElementById('raceSection').style.flexDirection = 'column';
+      document.getElementById('raceSection').style.alignItems    = 'center';
+      document.getElementById('raceSection').style.gap           = '1rem';
+    }
+  }
+
+  function resetAll() {
+    totalRolls = 0; sumTotal = 0; maxSumVal = 0;
+    rollHistory = [];
+    d1val.textContent = '?';
+    d2val.textContent = '?';
+    dieSum.textContent = '?';
+    totalRollsEl.textContent = '0';
+    maxSumEl.textContent     = '—';
+    avgSumEl.textContent     = '—';
+    renderHistory();
+    raceReset();
+  }
+
+  function rollDice() {
+    return [Math.ceil(Math.random()*6), Math.ceil(Math.random()*6)];
+  }
+  </script>
+
+</body>
+</html>

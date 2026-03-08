@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minigames Arcade 🕹️</title>
+  <meta name="description" content="Colección de minijuegos clásicos: Piedra Papel Tijera, Snake, Tres en Raya, Memory y más. ¡Juega gratis en tu navegador!" />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Google AdSense — reemplaza data-ad-client con tu ID -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+  <style>
+    /* ── Index-specific ── */
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0,255,136,0.1);
+      border: 1px solid var(--neon-green);
+      border-radius: 999px;
+      padding: 0.3rem 1rem;
+      font-size: 0.65rem;
+      color: var(--neon-green);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+      font-family: var(--font-pixel);
+    }
+    .hero-title {
+      font-size: clamp(1.3rem, 5vw, 2.6rem);
+      line-height: 1.3;
+      margin-bottom: 0.8rem;
+    }
+    .hero-title .accent { color: var(--neon-pink); text-shadow: var(--glow-pink); }
+    .hero-title .accent2{ color: var(--neon-cyan); text-shadow: var(--glow-cyan); }
+    .section-title {
+      font-family: var(--font-pixel);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .section-line {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .section-line::after {
+      content:'';
+      flex:1;
+      height:1px;
+      background: linear-gradient(90deg, var(--neon-cyan), transparent);
+      opacity: 0.3;
+    }
+    /* coin animation in header */
+    .coin { display:inline-block; }
+    .coin:hover { animation: spin 0.5s linear; }
+    /* stagger cards */
+    .game-card { opacity:0; animation: fadeInUp 0.45s ease forwards; }
+    .game-card:nth-child(1){animation-delay:0.05s}
+    .game-card:nth-child(2){animation-delay:0.10s}
+    .game-card:nth-child(3){animation-delay:0.15s}
+    .game-card:nth-child(4){animation-delay:0.20s}
+    .game-card:nth-child(5){animation-delay:0.25s}
+    .game-card:nth-child(6){animation-delay:0.30s}
+    /* top-banner ad */
+    .top-banner {
+      max-width: 728px;
+      margin: 1.5rem auto 0;
+      padding: 0 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header class="site-header">
+    <div class="container">
+      <span class="logo"><span>🕹️</span> MINI<span>GAMES</span> ARCADE</span>
+      <p class="tagline">Clásicos del navegador · Gratis · Sin instalación</p>
+    </div>
+  </header>
+
+  <!-- ══ TOP AD ══ -->
+  <div class="top-banner container">
+    <!-- AdSense banner 728×90 -->
+    <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto"></ins> -->
+    <div class="ad-placeholder">📢 Espacio publicitario — Google AdSense 728×90</div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <main class="container" style="padding-bottom:3rem;">
+
+    <!-- Hero -->
+    <section style="text-align:center; padding: 3rem 0 1.5rem;">
+      <div class="hero-badge animate-float">⚡ INSERT COIN TO PLAY</div>
+      <h1 class="hero-title pixel">
+        <span class="accent">6</span> Juegos,<br>
+        <span class="accent2">∞</span> Diversión
+      </h1>
+      <p style="color:var(--text-muted); max-width:480px; margin:0 auto; font-size:0.9rem;">
+        Minijuegos clásicos rediseñados con estilo arcade. Sin descargas, sin registros.
+        Solo tú, el teclado y el marcador.
+      </p>
+    </section>
+
+    <!-- Games Section -->
+    <section>
+      <div class="section-line">
+        <span class="section-title">// Juegos disponibles</span>
+      </div>
+
+      <div class="games-grid">
+
+        <!-- Card 1: RPS -->
+        <article class="game-card">
+          <div class="card-icon">✂️</div>
+          <span class="card-tag">Clásico · 1 jugador</span>
+          <h2 class="card-title">PIEDRA<br>PAPEL<br>TIJERA</h2>
+          <p class="card-desc">El eterno duelo contra la máquina. ¿Podrás predecir sus movimientos?</p>
+          <a href="rps.html" class="btn btn-primary">▶ JUGAR</a>
+        </article>
+
+        <!-- Card 2: RPSLS -->
+        <article class="game-card">
+          <div class="card-icon">🖖</div>
+          <span class="card-tag">The Big Bang Theory · 5 opciones</span>
+          <h2 class="card-title">P.P.T.<br>LAGARTO<br>SPOCK</h2>
+          <p class="card-desc">La versión extendida con Lagarto y Spock. ¡Bazinga!</p>
+          <a href="rpsls.html" class="btn btn-primary">▶ JUGAR</a>
+        </article>
+
+        <!-- Card 3: Tic Tac Toe -->
+        <article class="game-card">
+          <div class="card-icon">⭕</div>
+          <span class="card-tag">Estrategia · 1-2 jugadores</span>
+          <h2 class="card-title">TRES<br>EN<br>RAYA</h2>
+          <p class="card-desc">Reta a la IA o juega con un amigo en turnos. ¡Haz tres en línea!</p>
+          <a href="tictactoe.html" class="btn btn-primary">▶ JUGAR</a>
+        </article>
+
+        <!-- Card 4: Snake -->
+        <article class="game-card">
+          <div class="card-icon">🐍</div>
+          <span class="card-tag">Arcade · Récord mundial</span>
+          <h2 class="card-title">SNAKE</h2>
+          <p class="card-desc">La serpiente clásica que nunca pasa de moda. Come, crece, sobrevive.</p>
+          <a href="snake.html" class="btn btn-green">▶ JUGAR</a>
+        </article>
+
+        <!-- Card 5: Memory -->
+        <article class="game-card">
+          <div class="card-icon">🃏</div>
+          <span class="card-tag">Memoria · Tiempo límite</span>
+          <h2 class="card-title">MEMORY<br>MATCH</h2>
+          <p class="card-desc">Encuentra todos los pares con el menor número de intentos posible.</p>
+          <a href="memory.html" class="btn btn-pink">▶ JUGAR</a>
+        </article>
+
+        <!-- Card 6: Dice -->
+        <article class="game-card">
+          <div class="card-icon">🎲</div>
+          <span class="card-tag">Azar · Modo carrera</span>
+          <h2 class="card-title">DADOS<br>ARCADE</h2>
+          <p class="card-desc">Lanza los dados y compite por llegar primero a 100 puntos. ¡Suerte!</p>
+          <a href="dice.html" class="btn btn-primary">▶ JUGAR</a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Mid-page Ad -->
+    <div class="ad-section" style="max-width:100%; margin:1rem 0;">
+      <!-- AdSense responsive -->
+      <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins> -->
+      <div class="ad-placeholder" style="height:120px;">📢 Espacio publicitario — Google AdSense 970×90 / Responsive</div>
+    </div>
+
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <div class="neon-divider"></div>
+    <div class="footer-links mt-2">
+      <a href="about.html">Sobre el proyecto</a>
+      <a href="privacy.html">Política de privacidad</a>
+      <a href="contact.html">Contacto</a>
+    </div>
+    <p class="footer-copy">© 2025 Minigames Arcade — Hecho con ❤️ y JavaScript puro</p>
+  </footer>
+
+</body>
+</html>

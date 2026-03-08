@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Match — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Size selector */
+    .size-selector {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+    .size-btn {
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      font-family: var(--font-pixel);
+      font-size: 0.48rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .size-btn.active, .size-btn:hover {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+    }
+
+    /* Memory grid */
+    .memory-grid {
+      display: grid;
+      gap: 8px;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .memory-grid.grid-4x4 { grid-template-columns: repeat(4, 1fr); }
+    .memory-grid.grid-6x6 { grid-template-columns: repeat(6, 1fr); }
+
+    /* Card */
+    .mem-card {
+      position: relative;
+      cursor: pointer;
+      aspect-ratio: 1;
+    }
+
+    /* 4x4 */
+    .grid-4x4 .mem-card { width: 80px; }
+    /* 6x6 */
+    .grid-6x6 .mem-card { width: 64px; }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s ease;
+      border-radius: 10px;
+    }
+
+    .mem-card.flipped .card-inner,
+    .mem-card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* Back face (hidden) */
+    .card-back {
+      background: var(--bg-panel);
+      border: 2px solid var(--border);
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      transition: border-color 0.2s;
+    }
+    .mem-card:hover:not(.flipped):not(.matched) .card-back {
+      border-color: var(--neon-pink);
+    }
+
+    /* Front face (emoji) */
+    .card-front {
+      background: var(--bg-deep);
+      border: 2px solid var(--border);
+      transform: rotateY(180deg);
+      font-size: 1.8rem;
+    }
+
+    .grid-6x6 .card-front,
+    .grid-6x6 .card-back { font-size: 1.4rem; }
+
+    .mem-card.matched .card-front {
+      background: rgba(0,255,136,0.08);
+      border-color: var(--neon-green);
+      box-shadow: 0 0 10px rgba(0,255,136,0.25);
+    }
+
+    .mem-card.wrong .card-inner { animation: shake 0.4s ease; }
+
+    /* Timer */
+    .timer-display {
+      font-family: var(--font-pixel);
+      font-size: 1.2rem;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* Victory overlay */
+    .victory-banner {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--bg-card);
+      border: 1px solid var(--neon-green);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0,255,136,0.2);
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .victory-banner.show { display: flex; }
+
+    @media (max-width: 420px) {
+      .grid-4x4 .mem-card { width: 68px; }
+      .grid-6x6 .mem-card { width: 48px; }
+      .grid-6x6 .card-front,
+      .grid-6x6 .card-back { font-size: 1.1rem; }
+      .memory-grid { gap: 5px; }
+    }
+  </style>
+</head>
+<body class="game-page">
+
+  <header class="game-header">
+    <a href="index.html" class="btn btn-outline btn-sm">← Menú</a>
+    <h1 class="game-title">🃏 MEMORY MATCH</h1>
+    <button class="btn btn-pink btn-sm" id="resetBtn">↺ RESET</button>
+  </header>
+
+  <main class="game-main">
+
+    <!-- Size selector -->
+    <div class="size-selector">
+      <button class="size-btn active" data-size="4" onclick="setSize(4)">4×4 (Fácil)</button>
+      <button class="size-btn"        data-size="6" onclick="setSize(6)">6×6 (Difícil)</button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="scoreboard">
+      <div class="score-item">
+        <span class="score-label">Intentos</span>
+        <span class="score-value" id="scoreAttempts">0</span>
+      </div>
+      <div class="score-item">
+        <span class="score-label">Pares</span>
+        <span class="score-value" id="scorePairs">0</span>
+      </div>
+      <div class="score-item best">
+        <span class="score-label">Récord</span>
+        <span class="score-value" id="scoreBest">—</span>
+      </div>
+      <div class="score-item draws">
+        <span class="score-label">Tiempo</span>
+        <span class="timer-display" id="timerDisplay">00:00</span>
+      </div>
+    </div>
+
+    <!-- Victory banner -->
+    <div class="victory-banner" id="victoryBanner">
+      <div style="font-size:3rem;">🎉</div>
+      <div style="font-family:var(--font-pixel); font-size:0.75rem; color:var(--neon-green); text-shadow:var(--glow-green);">¡COMPLETADO!</div>
+      <div style="color:var(--text-muted); font-size:0.82rem;" id="victoryStats"></div>
+      <button class="btn btn-green" id="victoryReplay">▶ JUGAR DE NUEVO</button>
+    </div>
+
+    <!-- Memory grid -->
+    <div class="memory-grid grid-4x4" id="memoryGrid"></div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <strong>Cómo jugar:</strong> Haz clic en dos cartas para voltearlas.<br>
+      Si coinciden, se quedan descubiertas. ¡Encuentra todos los pares!<br>
+      <strong>Puntuación:</strong> Menos intentos = mejor puntuación.
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-section">
+      <div class="ad-placeholder">📢 Google AdSense — 728×90</div>
+    </div>
+
+  </main>
+
+  <script>
+  // ============================================================
+  //  Memory Match — Game Logic
+  // ============================================================
+
+  const EMOJIS_4 = ['🚀','🎮','🌙','⭐','🔥','💎','🎲','🃏'];
+  const EMOJIS_6 = ['🚀','🎮','🌙','⭐','🔥','💎','🎲','🃏','🐍','🦎','🖖','🏆','⚡','🎵','🌈','🍕','🦄','🔮'];
+
+  let gridSize     = 4;
+  let cards        = [];   // {emoji, id, matched, el}
+  let flipped      = [];   // currently flipped (max 2)
+  let attempts     = 0;
+  let pairs        = 0;
+  let totalPairs   = 0;
+  let locked       = false;
+  let timerInt     = null;
+  let timerSec     = 0;
+
+  const grid         = document.getElementById('memoryGrid');
+  const scoreAttempts= document.getElementById('scoreAttempts');
+  const scorePairs   = document.getElementById('scorePairs');
+  const scoreBest    = document.getElementById('scoreBest');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const victoryBanner= document.getElementById('victoryBanner');
+  const victoryStats = document.getElementById('victoryStats');
+
+  document.getElementById('resetBtn').addEventListener('click', () => buildGrid(gridSize));
+  document.getElementById('victoryReplay').addEventListener('click', () => buildGrid(gridSize));
+
+  // Init
+  buildGrid(4);
+  renderBest();
+
+  function setSize(size) {
+    gridSize = size;
+    document.querySelectorAll('.size-btn').forEach(b => {
+      b.classList.toggle('active', +b.dataset.size === size);
+    });
+    buildGrid(size);
+  }
+
+  function buildGrid(size) {
+    gridSize = size;
+    clearInterval(timerInt);
+    timerSec = 0;
+    attempts = 0;
+    pairs    = 0;
+    flipped  = [];
+    locked   = false;
+
+    // Update grid class
+    grid.className = `memory-grid grid-${size}x${size}`;
+
+    const pool = size === 4 ? EMOJIS_4 : EMOJIS_6;
+    totalPairs = size * size / 2;
+    const emojis = pool.slice(0, totalPairs);
+    const deck   = shuffle([...emojis, ...emojis]);
+
+    cards = deck.map((emoji, i) => ({ emoji, id: i, matched: false, flipped: false }));
+
+    // Render
+    grid.innerHTML = '';
+    cards.forEach((card, i) => {
+      const el = document.createElement('div');
+      el.className = 'mem-card';
+      el.innerHTML = `
+        <div class="card-inner">
+          <div class="card-back">🂠</div>
+          <div class="card-front">${card.emoji}</div>
+        </div>`;
+      el.addEventListener('click', () => onCardClick(i));
+      grid.appendChild(el);
+      card.el = el;
+    });
+
+    updateUI();
+    victoryBanner.classList.remove('show');
+
+    // Start timer
+    timerDisplay.textContent = '00:00';
+    timerInt = setInterval(() => {
+      timerSec++;
+      const m = String(Math.floor(timerSec/60)).padStart(2,'0');
+      const s = String(timerSec % 60).padStart(2,'0');
+      timerDisplay.textContent = `${m}:${s}`;
+    }, 1000);
+  }
+
+  function onCardClick(i) {
+    const card = cards[i];
+    if (locked || card.matched || card.flipped) return;
+    if (flipped.length >= 2) return;
+
+    card.flipped = true;
+    card.el.classList.add('flipped');
+    flipped.push(i);
+
+    if (flipped.length === 2) {
+      attempts++;
+      updateUI();
+      locked = true;
+      const [a, b] = flipped;
+
+      if (cards[a].emoji === cards[b].emoji) {
+        // Match!
+        setTimeout(() => {
+          cards[a].matched = true;
+          cards[b].matched = true;
+          cards[a].el.classList.add('matched');
+          cards[b].el.classList.add('matched');
+          pairs++;
+          updateUI();
+          flipped = [];
+          locked  = false;
+          if (pairs === totalPairs) celebrate();
+        }, 300);
+      } else {
+        // No match — flip back
+        setTimeout(() => {
+          cards[a].el.classList.add('wrong');
+          cards[b].el.classList.add('wrong');
+          setTimeout(() => {
+            cards[a].flipped = false;
+            cards[b].flipped = false;
+            cards[a].el.classList.remove('flipped','wrong');
+            cards[b].el.classList.remove('flipped','wrong');
+            flipped = [];
+            locked  = false;
+          }, 300);
+        }, 600);
+      }
+    }
+  }
+
+  function celebrate() {
+    clearInterval(timerInt);
+    const m = String(Math.floor(timerSec/60)).padStart(2,'0');
+    const s = String(timerSec % 60).padStart(2,'0');
+    victoryStats.textContent = `${attempts} intentos · ${m}:${s} minutos`;
+    victoryBanner.classList.add('show');
+    // Save best
+    const key  = `memory_best_${gridSize}`;
+    const prev = parseInt(localStorage.getItem(key)) || Infinity;
+    if (attempts < prev) {
+      localStorage.setItem(key, attempts);
+      renderBest();
+    }
+  }
+
+  function updateUI() {
+    scoreAttempts.textContent = attempts;
+    scorePairs.textContent    = `${pairs}/${totalPairs}`;
+  }
+
+  function renderBest() {
+    const key  = `memory_best_${gridSize}`;
+    const best = parseInt(localStorage.getItem(key));
+    scoreBest.textContent = best ? best : '—';
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  </script>
+
+</body>
+</html>

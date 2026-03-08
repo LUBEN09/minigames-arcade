@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Piedra Papel Tijera — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── RPS specific ── */
+    .choices-row {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+
+    .choice-btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--bg-panel);
+      border: 2px solid var(--border);
+      font-size: 2.8rem;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .choice-btn:hover {
+      transform: scale(1.12) translateY(-4px);
+      border-color: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .choice-btn:active { transform: scale(0.95); }
+
+    .choice-btn .choice-label {
+      position: absolute;
+      bottom: -22px;
+      font-family: var(--font-pixel);
+      font-size: 0.42rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+    }
+
+    /* Battle display */
+    .battle-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: var(--bg-panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      min-height: 120px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .battle-side {
+      text-align: center;
+      flex: 1;
+    }
+
+    .battle-side .fighter-emoji {
+      font-size: 3.5rem;
+      line-height: 1;
+      display: block;
+      min-height: 56px;
+      transition: transform 0.3s;
+    }
+
+    .battle-side .fighter-name {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    .battle-vs {
+      font-family: var(--font-pixel);
+      font-size: 1rem;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+
+    /* History */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      padding: 0.4rem 0.6rem;
+      background: var(--bg-deep);
+      border-radius: 6px;
+      border-left: 3px solid transparent;
+    }
+
+    .history-item.win-item  { border-color: var(--neon-green); }
+    .history-item.lose-item { border-color: var(--neon-pink); }
+    .history-item.draw-item { border-color: var(--neon-yellow); }
+
+    .history-badge {
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+    }
+    .badge-win  { background: rgba(0,255,136,0.15); color: var(--neon-green); }
+    .badge-lose { background: rgba(255,45,120,0.15); color: var(--neon-pink); }
+    .badge-draw { background: rgba(255,230,0,0.15);  color: var(--neon-yellow); }
+  </style>
+</head>
+<body class="game-page">
+
+  <!-- ══ GAME HEADER ══ -->
+  <header class="game-header">
+    <a href="index.html" class="btn btn-outline btn-sm">← Menú</a>
+    <h1 class="game-title">✂️ PIEDRA PAPEL TIJERA</h1>
+    <button class="btn btn-pink btn-sm" id="resetBtn">↺ RESET</button>
+  </header>
+
+  <!-- ══ MAIN ══ -->
+  <main class="game-main">
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div class="score-item wins">
+        <span class="score-label">Victorias</span>
+        <span class="score-value" id="scoreWins">0</span>
+      </div>
+      <div class="score-item draws">
+        <span class="score-label">Empates</span>
+        <span class="score-value" id="scoreDraws">0</span>
+      </div>
+      <div class="score-item losses">
+        <span class="score-label">Derrotas</span>
+        <span class="score-value" id="scoreLosses">0</span>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-msg" id="resultMsg">— Elige tu arma —</div>
+
+    <!-- Battle display -->
+    <div class="battle-display">
+      <div class="battle-side">
+        <span class="fighter-emoji" id="playerEmoji">❓</span>
+        <span class="fighter-name">TÚ</span>
+      </div>
+      <div class="battle-vs">VS</div>
+      <div class="battle-side">
+        <span class="fighter-emoji" id="cpuEmoji">❓</span>
+        <span class="fighter-name">CPU</span>
+      </div>
+    </div>
+
+    <!-- Choices -->
+    <div class="choices-row">
+      <button class="choice-btn" data-choice="rock" aria-label="Piedra">
+        🪨 <span class="choice-label">PIEDRA</span>
+      </button>
+      <button class="choice-btn" data-choice="paper" aria-label="Papel">
+        📄 <span class="choice-label">PAPEL</span>
+      </button>
+      <button class="choice-btn" data-choice="scissors" aria-label="Tijera">
+        ✂️ <span class="choice-label">TIJERA</span>
+      </button>
+    </div>
+
+    <!-- History -->
+    <div class="panel" style="max-width:420px;">
+      <div class="panel-title">📋 Últimas 5 jugadas</div>
+      <div class="history-list" id="historyList">
+        <p style="color:var(--text-muted); font-size:0.78rem; text-align:center;">Sin jugadas aún</p>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <strong>Cómo jugar:</strong> Haz clic en Piedra 🪨, Papel 📄 o Tijera ✂️.<br>
+      <strong>Reglas:</strong> Piedra aplasta tijera · Tijera corta papel · Papel cubre piedra.<br>
+      Tus estadísticas se guardan automáticamente.
+    </div>
+
+    <!-- Ad Section -->
+    <div class="ad-section">
+      <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto"></ins> -->
+      <div class="ad-placeholder">📢 Google AdSense — 728×90</div>
+    </div>
+
+  </main>
+
+  <script>
+  // ============================================================
+  //  Piedra Papel Tijera — Game Logic
+  // ============================================================
+  const CHOICES = {
+    rock:    { emoji: '🪨', label: 'Piedra' },
+    paper:   { emoji: '📄', label: 'Papel'  },
+    scissors:{ emoji: '✂️', label: 'Tijera' }
+  };
+
+  // Qué vence a qué: key vence a value
+  const WINS_AGAINST = {
+    rock:    'scissors',
+    paper:   'rock',
+    scissors:'paper'
+  };
+
+  // ── State (loaded from localStorage) ──
+  let stats = loadStats();
+  let history = loadHistory();
+
+  // ── DOM refs ──
+  const playerEmoji  = document.getElementById('playerEmoji');
+  const cpuEmoji     = document.getElementById('cpuEmoji');
+  const resultMsg    = document.getElementById('resultMsg');
+  const scoreWins    = document.getElementById('scoreWins');
+  const scoreDraws   = document.getElementById('scoreDraws');
+  const scoreLosses  = document.getElementById('scoreLosses');
+  const historyList  = document.getElementById('historyList');
+  const resetBtn     = document.getElementById('resetBtn');
+
+  // ── Init ──
+  renderStats();
+  renderHistory();
+
+  // ── Event listeners ──
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => playRound(btn.dataset.choice));
+  });
+
+  resetBtn.addEventListener('click', resetGame);
+
+  // ── Core logic ──
+  function playRound(playerChoice) {
+    const cpuChoice = randomChoice();
+
+    // Animate fighters
+    playerEmoji.textContent = CHOICES[playerChoice].emoji;
+    cpuEmoji.textContent    = CHOICES[cpuChoice].emoji;
+    playerEmoji.classList.add('animate-pop');
+    cpuEmoji.classList.add('animate-pop');
+    setTimeout(() => {
+      playerEmoji.classList.remove('animate-pop');
+      cpuEmoji.classList.remove('animate-pop');
+    }, 350);
+
+    // Determine result
+    let result, label, cssClass;
+    if (playerChoice === cpuChoice) {
+      result = 'draw'; label = '🤝 ¡EMPATE!'; cssClass = 'result-draw';
+      stats.draws++;
+    } else if (WINS_AGAINST[playerChoice] === cpuChoice) {
+      result = 'win'; label = '🏆 ¡GANASTE!'; cssClass = 'result-win';
+      stats.wins++;
+    } else {
+      result = 'lose'; label = '💀 PERDISTE'; cssClass = 'result-lose';
+      stats.losses++;
+    }
+
+    // Update UI
+    resultMsg.textContent = label;
+    resultMsg.className = 'result-msg ' + cssClass;
+    resultMsg.classList.add('animate-fadeInUp');
+    setTimeout(() => resultMsg.classList.remove('animate-fadeInUp'), 400);
+
+    // Save to history (max 5)
+    history.unshift({
+      player: playerChoice,
+      cpu:    cpuChoice,
+      result
+    });
+    if (history.length > 5) history.pop();
+
+    saveStats();
+    saveHistory();
+    renderStats();
+    renderHistory();
+  }
+
+  function randomChoice() {
+    const keys = Object.keys(CHOICES);
+    return keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  function resetGame() {
+    stats = { wins: 0, draws: 0, losses: 0 };
+    history = [];
+    saveStats();
+    saveHistory();
+    renderStats();
+    renderHistory();
+    playerEmoji.textContent = '❓';
+    cpuEmoji.textContent    = '❓';
+    resultMsg.textContent   = '— Elige tu arma —';
+    resultMsg.className     = 'result-msg';
+  }
+
+  // ── Render ──
+  function renderStats() {
+    scoreWins.textContent   = stats.wins;
+    scoreDraws.textContent  = stats.draws;
+    scoreLosses.textContent = stats.losses;
+  }
+
+  function renderHistory() {
+    if (!history.length) {
+      historyList.innerHTML = '<p style="color:var(--text-muted);font-size:0.78rem;text-align:center;">Sin jugadas aún</p>';
+      return;
+    }
+    historyList.innerHTML = history.map(h => {
+      const cls   = h.result === 'win' ? 'win-item' : h.result === 'lose' ? 'lose-item' : 'draw-item';
+      const badge = h.result === 'win' ? 'badge-win' : h.result === 'lose' ? 'badge-lose' : 'badge-draw';
+      const lbl   = h.result === 'win' ? 'WIN' : h.result === 'lose' ? 'LOSE' : 'DRAW';
+      return `<div class="history-item ${cls}">
+        <span>${CHOICES[h.player].emoji} ${CHOICES[h.player].label} vs ${CHOICES[h.cpu].label} ${CHOICES[h.cpu].emoji}</span>
+        <span class="history-badge ${badge}">${lbl}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── localStorage helpers ──
+  function loadStats() {
+    try { return JSON.parse(localStorage.getItem('rps_stats')) || { wins:0, draws:0, losses:0 }; }
+    catch { return { wins:0, draws:0, losses:0 }; }
+  }
+  function saveStats()   { localStorage.setItem('rps_stats',   JSON.stringify(stats));   }
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem('rps_history')) || []; }
+    catch { return []; }
+  }
+  function saveHistory() { localStorage.setItem('rps_history', JSON.stringify(history)); }
+  </script>
+
+</body>
+</html>

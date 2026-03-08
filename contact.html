@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .legal-page { max-width: 640px; margin: 0 auto; padding: 3rem 1.5rem; position: relative; z-index:1; }
+    .legal-page h1 { font-size: 0.9rem; color: var(--neon-cyan); text-shadow: var(--glow-cyan); margin-bottom: 2rem; }
+    .legal-page h2 { font-size: 0.62rem; color: var(--neon-green); margin: 2rem 0 0.8rem; }
+    .back-link { display:inline-flex; align-items:center; gap:0.5rem; color:var(--neon-cyan); font-size:0.78rem; margin-bottom:2rem; }
+
+    /* Form styles */
+    .contact-form { display:flex; flex-direction:column; gap:1.2rem; }
+    .form-group { display:flex; flex-direction:column; gap:0.4rem; }
+    .form-label {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .form-input, .form-textarea, .form-select {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 2px rgba(0,212,255,0.12);
+    }
+    .form-textarea { min-height: 140px; resize: vertical; }
+    .form-select option { background: var(--bg-deep); }
+
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--neon-green);
+      border-radius: var(--radius);
+      box-shadow: 0 0 30px rgba(0,255,136,0.15);
+    }
+    .success-msg.show { display: block; }
+    .success-msg .ok-icon { font-size: 3rem; display:block; margin-bottom:1rem; }
+    .success-msg .ok-title { font-family:var(--font-pixel); font-size:0.7rem; color:var(--neon-green); text-shadow:var(--glow-green); }
+
+    .contact-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .info-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+    .info-card .info-icon { font-size:1.8rem; display:block; margin-bottom:0.4rem; }
+    .info-card .info-label { font-family:var(--font-pixel); font-size:0.45rem; color:var(--text-muted); display:block; margin-bottom:0.3rem; }
+    .info-card .info-val { font-size:0.82rem; color:var(--text-main); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo" style="text-decoration:none;"><span>🕹️</span> MINI<span>GAMES</span> ARCADE</a>
+    </div>
+  </header>
+
+  <div class="legal-page container">
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+    <h1>CONTACTO</h1>
+
+    <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.8; margin-bottom:2rem;">
+      ¿Tienes sugerencias para nuevos juegos, encontraste un bug o simplemente quieres saludar?
+      Escríbenos, respondemos en 24-48 horas.
+    </p>
+
+    <!-- Contact cards -->
+    <div class="contact-info" style="margin-bottom:2.5rem;">
+      <div class="info-card">
+        <span class="info-icon">📧</span>
+        <span class="info-label">Email</span>
+        <span class="info-val">hola@minigamesarcade.com</span>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">🐦</span>
+        <span class="info-label">Twitter/X</span>
+        <span class="info-val">@minigamesarcade</span>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">💬</span>
+        <span class="info-label">Respuesta</span>
+        <span class="info-val">24–48 horas</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div id="formWrapper">
+      <h2>📨 ENVÍA UN MENSAJE</h2>
+      <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:1.5rem;">
+        (Ejemplo de formulario — integra con Formspree, EmailJS u otro servicio)
+      </p>
+
+      <form class="contact-form" id="contactForm">
+        <div class="form-group">
+          <label class="form-label" for="nameInput">Tu nombre</label>
+          <input class="form-input" id="nameInput" type="text" placeholder="Player One" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Email</label>
+          <input class="form-input" id="emailInput" type="email" placeholder="player@arcade.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="subjectInput">Asunto</label>
+          <select class="form-select" id="subjectInput">
+            <option value="bug">🐛 Reportar un bug</option>
+            <option value="suggestion">💡 Sugerencia de juego</option>
+            <option value="ads">📢 Publicidad / colaboración</option>
+            <option value="other">✉️ Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="messageInput">Mensaje</label>
+          <textarea class="form-textarea" id="messageInput" placeholder="Escribe tu mensaje aquí..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="align-self:flex-start; padding:0.8rem 2rem;">
+          📨 ENVIAR MENSAJE
+        </button>
+      </form>
+    </div>
+
+    <!-- Success message -->
+    <div class="success-msg" id="successMsg">
+      <span class="ok-icon">✅</span>
+      <div class="ok-title">¡MENSAJE ENVIADO!</div>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.8rem;">
+        Gracias por contactarnos. Te responderemos pronto.
+      </p>
+      <button class="btn btn-outline btn-sm mt-2" onclick="document.getElementById('successMsg').classList.remove('show'); document.getElementById('formWrapper').style.display='block';">
+        Enviar otro mensaje
+      </button>
+    </div>
+
+    <div style="margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="index.html" class="btn btn-primary">🕹️ Jugar</a>
+        <a href="about.html" class="btn btn-outline btn-sm">Sobre el proyecto</a>
+        <a href="privacy.html" class="btn btn-outline btn-sm">Privacidad</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="neon-divider"></div>
+    <div class="footer-links mt-2">
+      <a href="privacy.html">Política de privacidad</a>
+      <a href="contact.html">Contacto</a>
+      <a href="about.html">About</a>
+    </div>
+    <p class="footer-copy">© 2025 Minigames Arcade</p>
+  </footer>
+
+  <script>
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // En producción: integrar con Formspree (action="https://formspree.io/f/YOURCODE")
+    // o EmailJS para envío real sin backend.
+    document.getElementById('formWrapper').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre el Proyecto — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .legal-page { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem; position: relative; z-index:1; }
+    .legal-page h1 { font-size: 0.9rem; color: var(--neon-cyan); text-shadow: var(--glow-cyan); margin-bottom: 0.5rem; }
+    .legal-page h2 { font-size: 0.62rem; color: var(--neon-green); margin: 2rem 0 0.8rem; }
+    .legal-page p, .legal-page li { color: var(--text-muted); font-size: 0.87rem; line-height: 1.8; margin-bottom: 0.7rem; }
+    .legal-page ul { padding-left: 1.5rem; }
+    .legal-page strong { color: var(--text-main); }
+    .back-link { display:inline-flex; align-items:center; gap:0.5rem; color:var(--neon-cyan); font-size:0.78rem; margin-bottom:2rem; }
+    .tech-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:0.8rem; margin-top:1rem; }
+    .tech-item {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.8rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .tech-item .tech-icon { font-size: 1.8rem; display: block; margin-bottom: 0.4rem; }
+    .game-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:0.7rem; margin-top:1rem; }
+    .game-list-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .game-list-item a { color: var(--neon-cyan); font-size:0.75rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo" style="text-decoration:none;"><span>🕹️</span> MINI<span>GAMES</span> ARCADE</a>
+    </div>
+  </header>
+
+  <div class="legal-page container">
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+    <h1>SOBRE EL PROYECTO</h1>
+
+    <p><strong>Minigames Arcade</strong> es una colección de juegos clásicos del navegador, rediseñados con una estética retro-neón moderna. El proyecto nació con el objetivo de ofrecer entretenimiento inmediato, sin descargas ni registros.</p>
+
+    <h2>🎮 JUEGOS DISPONIBLES</h2>
+    <div class="game-list">
+      <div class="game-list-item">✂️ <span>Piedra Papel Tijera <a href="rps.html">Jugar</a></span></div>
+      <div class="game-list-item">🖖 <span>PPT Lagarto Spock <a href="rpsls.html">Jugar</a></span></div>
+      <div class="game-list-item">⭕ <span>Tres en Raya <a href="tictactoe.html">Jugar</a></span></div>
+      <div class="game-list-item">🐍 <span>Snake <a href="snake.html">Jugar</a></span></div>
+      <div class="game-list-item">🃏 <span>Memory Match <a href="memory.html">Jugar</a></span></div>
+      <div class="game-list-item">🎲 <span>Dados Arcade <a href="dice.html">Jugar</a></span></div>
+    </div>
+
+    <h2>⚙️ TECNOLOGÍAS USADAS</h2>
+    <div class="tech-grid">
+      <div class="tech-item"><span class="tech-icon">📄</span>HTML5 semántico</div>
+      <div class="tech-item"><span class="tech-icon">🎨</span>CSS3 + Variables</div>
+      <div class="tech-item"><span class="tech-icon">⚡</span>JavaScript puro</div>
+      <div class="tech-item"><span class="tech-icon">🎭</span>Canvas API</div>
+      <div class="tech-item"><span class="tech-icon">💾</span>localStorage</div>
+      <div class="tech-item"><span class="tech-icon">🔤</span>Google Fonts</div>
+    </div>
+
+    <h2>✨ CARACTERÍSTICAS</h2>
+    <ul>
+      <li><strong>Sin dependencias externas:</strong> Vanilla JS puro, sin frameworks ni librerías.</li>
+      <li><strong>Responsive:</strong> Diseño adaptable para móvil, tablet y escritorio.</li>
+      <li><strong>Puntuaciones persistentes:</strong> Los récords se guardan en localStorage.</li>
+      <li><strong>Accesible:</strong> Atributos ARIA y controles de teclado donde aplica.</li>
+      <li><strong>Listo para AdSense:</strong> Espacios publicitarios integrados.</li>
+    </ul>
+
+    <h2>🏗️ ESTRUCTURA DEL PROYECTO</h2>
+    <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; font-family:monospace; font-size:0.82rem; color:var(--text-muted); overflow-x:auto;">
+      <pre>minigames-arcade/
+├── index.html        ← Menú principal
+├── rps.html          ← Piedra Papel Tijera
+├── rpsls.html        ← PPT Lagarto Spock
+├── tictactoe.html    ← Tres en Raya
+├── snake.html        ← Snake
+├── memory.html       ← Memory Match
+├── dice.html         ← Dados Arcade
+├── 404.html          ← Página de error
+├── about.html        ← Esta página
+├── contact.html      ← Contacto
+├── privacy.html      ← Privacidad
+└── css/
+    └── style.css     ← Estilos compartidos</pre>
+    </div>
+
+    <div style="margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="index.html" class="btn btn-primary">🕹️ Jugar ahora</a>
+        <a href="contact.html" class="btn btn-outline btn-sm">Contacto</a>
+        <a href="privacy.html" class="btn btn-outline btn-sm">Privacidad</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="neon-divider"></div>
+    <div class="footer-links mt-2">
+      <a href="privacy.html">Política de privacidad</a>
+      <a href="contact.html">Contacto</a>
+      <a href="about.html">About</a>
+    </div>
+    <p class="footer-copy">© 2025 Minigames Arcade</p>
+  </footer>
+</body>
+</html>

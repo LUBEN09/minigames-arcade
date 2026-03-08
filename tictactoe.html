@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tres en Raya — Minigames Arcade</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Mode selector */
+    .mode-selector {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-btn.active, .mode-btn:hover {
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    /* Board */
+    .board-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: var(--bg-deep);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 2.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      font-family: var(--font-pixel);
+    }
+
+    .cell:hover:not(.taken) {
+      background: rgba(0,212,255,0.06);
+      border-color: var(--neon-cyan);
+      transform: scale(1.05);
+    }
+
+    .cell.taken { cursor: default; }
+
+    .cell.x-cell {
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+    .cell.o-cell {
+      color: var(--neon-pink);
+      text-shadow: var(--glow-pink);
+    }
+
+    .cell.winning-cell {
+      background: rgba(0,255,136,0.1);
+      border-color: var(--neon-green);
+      box-shadow: 0 0 12px rgba(0,255,136,0.3);
+      animation: pop 0.3s ease;
+    }
+
+    /* Turn indicator */
+    .turn-indicator {
+      font-family: var(--font-pixel);
+      font-size: 0.6rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .turn-x { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+    .turn-o { color: var(--neon-pink); border-color: var(--neon-pink); }
+
+    /* Score */
+    .ttt-scores {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 400px) {
+      .cell { width: 80px; height: 80px; font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body class="game-page">
+
+  <header class="game-header">
+    <a href="index.html" class="btn btn-outline btn-sm">← Menú</a>
+    <h1 class="game-title">⭕ TRES EN RAYA</h1>
+    <button class="btn btn-pink btn-sm" id="resetBtn">↺ RESET</button>
+  </header>
+
+  <main class="game-main">
+
+    <!-- Mode selector -->
+    <div class="mode-selector">
+      <button class="mode-btn active" id="modeAI"  onclick="setMode('ai')">🤖 VS CPU</button>
+      <button class="mode-btn"        id="mode2P"  onclick="setMode('2p')">👥 2 JUGADORES</button>
+    </div>
+
+    <!-- Scores -->
+    <div class="ttt-scores">
+      <div class="score-item wins">
+        <span class="score-label" id="p1Label">X (TÚ)</span>
+        <span class="score-value" id="scoreX">0</span>
+      </div>
+      <div class="score-item draws">
+        <span class="score-label">Empates</span>
+        <span class="score-value" id="scoreDraw">0</span>
+      </div>
+      <div class="score-item losses">
+        <span class="score-label" id="p2Label">O (CPU)</span>
+        <span class="score-value" id="scoreO">0</span>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-msg" id="resultMsg">Tu turno — X</div>
+
+    <!-- Turn indicator -->
+    <div class="turn-indicator turn-x" id="turnIndicator">Turno: X</div>
+
+    <!-- Board -->
+    <div class="board-wrap">
+      <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <strong>VS CPU:</strong> Juega como X. La IA intenta bloquearte y ganar.<br>
+      <strong>2 Jugadores:</strong> Turnos alternos en el mismo dispositivo.<br>
+      Las puntuaciones se guardan mientras no hagas reset.
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-section">
+      <div class="ad-placeholder">📢 Google AdSense — 728×90</div>
+    </div>
+
+  </main>
+
+  <script>
+  // ============================================================
+  //  Tres en Raya — Game Logic
+  // ============================================================
+
+  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+  let mode      = 'ai'; // 'ai' | '2p'
+  let board     = Array(9).fill('');
+  let current   = 'X'; // current player
+  let gameOver  = false;
+  let scores    = loadScores();
+
+  const cells         = document.querySelectorAll('.cell');
+  const resultMsg     = document.getElementById('resultMsg');
+  const turnIndicator = document.getElementById('turnIndicator');
+  const scoreX        = document.getElementById('scoreX');
+  const scoreO        = document.getElementById('scoreO');
+  const scoreDraw     = document.getElementById('scoreDraw');
+  const p1Label       = document.getElementById('p1Label');
+  const p2Label       = document.getElementById('p2Label');
+
+  renderScores();
+
+  cells.forEach(cell => cell.addEventListener('click', onCellClick));
+  document.getElementById('resetBtn').addEventListener('click', resetGame);
+
+  function onCellClick(e) {
+    const idx = +e.target.dataset.index;
+    if (gameOver || board[idx]) return;
+    if (mode === 'ai' && current === 'O') return; // wait for AI
+
+    makeMove(idx, current);
+    if (!gameOver && mode === 'ai' && current === 'O') {
+      setTimeout(aiMove, 450);
+    }
+  }
+
+  function makeMove(idx, player) {
+    board[idx] = player;
+    const cell = cells[idx];
+    cell.textContent = player === 'X' ? '✕' : '○';
+    cell.classList.add('taken', player === 'X' ? 'x-cell' : 'o-cell');
+    cell.classList.add('animate-pop');
+
+    const win = checkWinner();
+    if (win) {
+      highlightWin(win);
+      gameOver = true;
+      if (player === 'X') {
+        scores.x++;
+        showResult(mode === 'ai' ? '🏆 ¡GANASTE!' : '🏆 ¡X GANA!', 'result-win');
+      } else {
+        scores.o++;
+        showResult(mode === 'ai' ? '💀 CPU GANA' : '🏆 ¡O GANA!', 'result-lose');
+      }
+      saveScores(); renderScores();
+      return;
+    }
+    if (board.every(v => v)) {
+      gameOver = true;
+      scores.draw++;
+      showResult('🤝 EMPATE', 'result-draw');
+      saveScores(); renderScores();
+      return;
+    }
+
+    current = current === 'X' ? 'O' : 'X';
+    updateTurnUI();
+  }
+
+  // ── AI (minimax) ──
+  function aiMove() {
+    if (gameOver) return;
+    const best = minimax(board, 'O', 0);
+    makeMove(best.idx, 'O');
+  }
+
+  function minimax(b, player, depth) {
+    const win = checkWinnerOnBoard(b);
+    if (win === 'X') return { score: -10 + depth };
+    if (win === 'O') return { score:  10 - depth };
+    if (b.every(v => v)) return { score: 0 };
+
+    const moves = [];
+    b.forEach((v, i) => {
+      if (!v) {
+        const nb = [...b]; nb[i] = player;
+        const result = minimax(nb, player === 'O' ? 'X' : 'O', depth + 1);
+        moves.push({ idx: i, score: result.score });
+      }
+    });
+
+    if (player === 'O') return moves.reduce((a, b) => b.score > a.score ? b : a);
+    else                return moves.reduce((a, b) => b.score < a.score ? b : a);
+  }
+
+  function checkWinner() {
+    for (const [a,b,c] of WINS) {
+      if (board[a] && board[a] === board[b] && board[b] === board[c]) return [a,b,c];
+    }
+    return null;
+  }
+
+  function checkWinnerOnBoard(b) {
+    for (const [a,i,c] of WINS) {
+      if (b[a] && b[a] === b[i] && b[i] === b[c]) return b[a];
+    }
+    return null;
+  }
+
+  function highlightWin(combo) {
+    combo.forEach(i => cells[i].classList.add('winning-cell'));
+  }
+
+  function showResult(msg, cls) {
+    resultMsg.textContent = msg;
+    resultMsg.className   = 'result-msg ' + cls;
+    turnIndicator.textContent = '— Juego terminado —';
+    turnIndicator.className   = 'turn-indicator';
+  }
+
+  function updateTurnUI() {
+    const name = current === 'X'
+      ? (mode === '2p' ? 'Turno: Jugador X' : 'Tu turno — X')
+      : (mode === '2p' ? 'Turno: Jugador O' : 'Turno: CPU (O)');
+    resultMsg.textContent = name;
+    resultMsg.className   = 'result-msg ' + (current === 'X' ? 'result-win' : 'result-lose');
+    turnIndicator.textContent = `Turno: ${current}`;
+    turnIndicator.className   = `turn-indicator turn-${current.toLowerCase()}`;
+  }
+
+  function resetGame() {
+    board    = Array(9).fill('');
+    current  = 'X';
+    gameOver = false;
+    cells.forEach(c => {
+      c.textContent = '';
+      c.className   = 'cell';
+    });
+    resultMsg.textContent = mode === 'ai' ? 'Tu turno — X' : 'Turno: X';
+    resultMsg.className   = 'result-msg result-win';
+    turnIndicator.textContent = 'Turno: X';
+    turnIndicator.className   = 'turn-indicator turn-x';
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('modeAI').classList.toggle('active', m === 'ai');
+    document.getElementById('mode2P').classList.toggle('active', m === '2p');
+    p1Label.textContent = m === 'ai' ? 'X (TÚ)' : 'Jugador X';
+    p2Label.textContent = m === 'ai' ? 'O (CPU)' : 'Jugador O';
+    scores = { x:0, o:0, draw:0 };
+    saveScores(); renderScores();
+    resetGame();
+  }
+
+  function renderScores() {
+    scoreX.textContent    = scores.x;
+    scoreO.textContent    = scores.o;
+    scoreDraw.textContent = scores.draw;
+  }
+
+  function loadScores()  { try { return JSON.parse(localStorage.getItem('ttt_scores')) || {x:0,o:0,draw:0}; } catch{return{x:0,o:0,draw:0};} }
+  function saveScores()  { localStorage.setItem('ttt_scores', JSON.stringify(scores)); }
+  </script>
+
+</body>
+</html>
